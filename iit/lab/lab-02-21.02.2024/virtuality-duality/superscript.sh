@@ -16,19 +16,10 @@ else
   echo "Failed to change the port. Please check the sshd_config file."
 fi
 
-if ! dotnet --version &> /dev/null; then
-    echo ".NET is not installed. Installing .NET..."
+sudo apt-get update
 
-    wget https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
-    sudo dpkg -i packages-microsoft-prod.deb
-    rm packages-microsoft-prod.deb
+sudo apt-get install -y python3 python3-pip
 
-    sudo apt-get update; \
-    sudo apt-get install -y apt-transport-https && \
-    sudo apt-get update && \
-    sudo apt-get install -y dotnet-sdk-6.0
+pip3 install Flask
 
-    echo ".NET installed successfully."
-else
-    echo ".NET is already installed."
-fi
+nohup python3 sync/server.py &
