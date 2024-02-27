@@ -1,0 +1,31 @@
+@startuml usecase
+
+left to right direction
+skinparam packageStyle rectangle
+actor Guest
+actor User
+actor Admin
+
+rectangle WeatherSystem {
+    Guest --> (Search Weather by City)
+    Guest --> (View Weather Forecast)
+    Guest --> (Register)
+    (View Weather Forecast) .> (Weather Recommendations) : extends
+    (View Weather Forecast) .> (Weather Warnings) : extends
+
+    User --> (Sign In)
+    User --> (Add City to Favorites)
+    User --> (Receive Weather Notifications)
+    User -left-> (Search Weather by City)
+    User -left-> (View Weather Forecast)
+
+    Admin --> (Add Weather Forecast)
+    Admin --> (Edit Weather Forecast)
+    Admin --> (Delete Weather Forecast)
+    Admin --> (Manage Cities and Regions)
+
+    (Add City to Favorites) .> (Sign In) : include
+    (Receive Weather Notifications) .> (Sign In) : include
+}
+
+@enduml
