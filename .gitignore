@@ -70,3 +70,5 @@ Desktop.ini
 .DS_Store
 
 .vagrant
+
+node_modules
