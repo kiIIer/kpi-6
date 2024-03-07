@@ -1,0 +1,24 @@
+version: "3.8"
+services:
+  backend:
+    build: .
+    image: lab03_1_teamSPM
+    ports:
+      - "83:80"
+    volumes:
+      - ./lab01:/usr/share/nginx/html
+    depends_on:
+      - db
+    environment:
+      - PGHOST=db
+      - PGUSER=postgres
+      - PGPASSWORD=example
+      - PGDATABASE=postgres
+      - PGPORT=5432
+    restart: on-failure
+
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_PASSWORD: example
+    restart: on-failure
