@@ -1,0 +1,22 @@
+@startuml create_account
+actor User as U
+participant "Auth0" as A
+participant "Site" as S
+participant "Server" as YS
+database "Database" as DB
+
+U -> A: Register using Email/Google
+A -> U: Authenticates & redirects to Site with auth code
+U -> S: Accesses Site with auth code
+S -> YS: Sends auth code to Your Server
+activate YS
+YS -> A: Requests tokens using authorization code
+A -> YS: Returns tokens
+YS -> DB: Creates/Updates user profile
+activate DB
+DB -> YS: Confirmation
+deactivate DB
+YS -> S: Sends success confirmation to Site
+S -> U: Displays success message to User
+deactivate YS
+@enduml
