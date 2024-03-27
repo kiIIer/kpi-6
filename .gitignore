@@ -71,4 +71,6 @@ Desktop.ini
 
 .vagrant
 
+*.xlsx
+
 node_modules
