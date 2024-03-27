@@ -14,7 +14,7 @@ def shuffle_state(goal_state):
     state = goal_state
     moves = ['U', 'D', 'L', 'R']
     zero_index = state.index(0)
-    for _ in range(100):
+    for _ in range(500):
         row, col = divmod(zero_index, 3)
         move = random.choice(moves)
         if move == 'U' and row > 0:
@@ -36,6 +36,7 @@ def ldfs(initial_state, goal_state, limit):
     start_time = time.time()
     generated_nodes = 0
     max_nodes_in_memory = 0
+    path_moves = []
 
     def is_goal(state):
         return state == goal_state
@@ -52,33 +53,35 @@ def ldfs(initial_state, goal_state, limit):
         zero_index = state.index(0)
         row, col = divmod(zero_index, 3)
 
-        if row > 0: moves.append(swap(state, zero_index, zero_index - 3))
-        if row < 2: moves.append(swap(state, zero_index, zero_index + 3))
-        if col > 0: moves.append(swap(state, zero_index, zero_index - 1))
-        if col < 2: moves.append(swap(state, zero_index, zero_index + 1))
+        if row > 0: moves.append(('U', swap(state, zero_index, zero_index - 3)))
+        if row < 2: moves.append(('D', swap(state, zero_index, zero_index + 3)))
+        if col > 0: moves.append(('L', swap(state, zero_index, zero_index - 1)))
+        if col < 2: moves.append(('R', swap(state, zero_index, zero_index + 1)))
 
         generated_nodes += len(moves)
         return moves
 
-    def dfs(path, depth):
+    def dfs(path, moves, depth):
         nonlocal max_nodes_in_memory
-        if depth == 0: return
+        if depth == 0: return None, []
         current_state = path[-1]
         if is_goal(current_state):
-            return path
-        for child in get_children(current_state):
+            return path, moves
+        for move, child in get_children(current_state):
             if child not in path:
                 max_nodes_in_memory = max(max_nodes_in_memory, len(path))
-                new_path = dfs(path + [child], depth - 1)
-                if new_path: return new_path
-        return None
+                new_path, new_moves = dfs(path + [child], moves + [move], depth - 1)
+                if new_path: return new_path, new_moves
+        return None, []
 
     for depth in range(limit + 1):
-        path = dfs([initial_state], depth)
+        path, path_moves = dfs([initial_state], [], depth)
         if path:
             time_taken = time.time() - start_time
-            return path, time_taken, generated_nodes, max_nodes_in_memory
-    return None, time.time() - start_time, generated_nodes, max_nodes_in_memory
+            return path, path_moves, time_taken, generated_nodes, max_nodes_in_memory
+
+    time_taken = time.time() - start_time
+    return None, [], time_taken, generated_nodes, max_nodes_in_memory
 
 
 def a_star_solver(initial_state, goal_state):
@@ -101,14 +104,14 @@ def a_star_solver(initial_state, goal_state):
         zero_index = state.index(0)
         row, col = divmod(zero_index, 3)
 
-        if row > 0: neighbors.append('U')
-        if row < 2: neighbors.append('D')
-        if col > 0: neighbors.append('L')
-        if col < 2: neighbors.append('R')
+        if row > 0: neighbors.append(('U', do_move(state, 'U')))
+        if row < 2: neighbors.append(('D', do_move(state, 'D')))
+        if col > 0: neighbors.append(('L', do_move(state, 'L')))
+        if col < 2: neighbors.append(('R', do_move(state, 'R')))
 
         return neighbors
 
-    def move(state, direction):
+    def do_move(state, direction):
         zero_index = state.index(0)
         row, col = divmod(zero_index, 3)
         if direction == 'U': swap_with = zero_index - 3
@@ -121,11 +124,15 @@ def a_star_solver(initial_state, goal_state):
 
     def reconstruct_path(came_from, current):
         total_path = [current]
+        moves = []
         while current in came_from:
-            current = came_from[current]
-            total_path.append(current)
+            next_state, move = came_from[current]
+            total_path.append(next_state)
+            moves.append(move)
+            current = next_state
         total_path.reverse()
-        return total_path
+        moves.reverse()
+        return total_path, moves
 
     open_set = PriorityQueue()
     open_set.put((manhattan_distance(initial_state), initial_state))
@@ -138,21 +145,21 @@ def a_star_solver(initial_state, goal_state):
         max_nodes_in_memory = max(max_nodes_in_memory, open_set.qsize())
 
         if current == goal_state:
+            path, moves = reconstruct_path(came_from, current)
             time_taken = time.time() - start_time
-            return reconstruct_path(came_from, current), time_taken, generated_nodes, max_nodes_in_memory
+            return path, moves, time_taken, generated_nodes, max_nodes_in_memory
 
-        for direction in get_neighbors(current):
+        for move, neighbor in get_neighbors(current):
             generated_nodes += 1
-            neighbor = move(current, direction)
-            tentative_g_score = g_score[current] + 1
-            if neighbor not in g_score or tentative_g_score < g_score[neighbor]:
-                came_from[neighbor] = current
+            tentative_g_score = g_score.get(current, float('inf')) + 1
+            if tentative_g_score < g_score.get(neighbor, float('inf')):
+                came_from[neighbor] = (current, move)
                 g_score[neighbor] = tentative_g_score
                 f_score[neighbor] = tentative_g_score + manhattan_distance(neighbor)
                 if not any(neighbor == item[1] for item in open_set.queue):
                     open_set.put((f_score[neighbor], neighbor))
 
-    return False, time.time() - start_time, generated_nodes, max_nodes_in_memory
+    return False, [], time.time() - start_time, generated_nodes, max_nodes_in_memory
 
 
 def valid_moves(state):
@@ -206,16 +213,14 @@ limit = 40
 for _ in range(N):
     initial_state = shuffle_state(goal_state)
 
-    ldfs_start_time = time.time()
-    ldfs_solution, ldfs_time_taken, ldfs_generated_nodes, ldfs_max_nodes_in_memory = ldfs(initial_state, goal_state,
-                                                                                          limit)
-    ldfs_end_time = time.time()
+    ldfs_solution, ldfs_moves, ldfs_time_taken, ldfs_generated_nodes, ldfs_max_nodes_in_memory = ldfs(initial_state, goal_state, limit)
 
-    a_star_solution, a_star_time_taken, a_star_generated_nodes, a_star_max_nodes_in_memory = a_star_solver(
-        initial_state, goal_state)
+    a_star_solution, a_star_moves, a_star_time_taken, a_star_generated_nodes, a_star_max_nodes_in_memory = a_star_solver(initial_state, goal_state)
 
     results.append({
         'starting_state': initial_state,
+        'solution_moves': ldfs_moves,
+        'moves_n': len(ldfs_moves),
         'time_taken': ldfs_time_taken,
         'algorithm': 'LDFS',
         'generated_nodes': ldfs_generated_nodes,
@@ -224,6 +229,8 @@ for _ in range(N):
 
     results.append({
         'starting_state': initial_state,
+        'solution_moves': a_star_moves,
+        'moves_n': len(a_star_moves),
         'time_taken': a_star_time_taken,
         'algorithm': 'A*',
         'generated_nodes': a_star_generated_nodes,
@@ -231,6 +238,6 @@ for _ in range(N):
     })
 
 df_results = pd.DataFrame(results)
-df_results.to_excel('results.xlsx')
+df_results.to_excel('results_report_ns.xlsx', index=False)
 
 print(df_results)
