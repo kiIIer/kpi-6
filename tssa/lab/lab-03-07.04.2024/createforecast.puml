@@ -1,0 +1,38 @@
+@startuml create-forecast
+left to right direction
+actor User
+rectangle SPA {
+    [EditForecastPresComponent]
+    [EditForecastContComponent]
+    [popUpPresComponent]
+    rectangle Redux{
+        [AppStore]
+        [SaveForecastEffect]
+        [PopUpEffect]
+    }
+    [ForecastService]
+}
+
+rectangle Server {
+    [ForecastController]
+    [ForecastRepo]
+}
+
+database DB
+
+User -down-> [EditForecastPresComponent] : 1. Save Forecast Button
+[EditForecastPresComponent] -> [EditForecastContComponent] : 2. emit(SaveForecastEvent)
+[EditForecastContComponent] -down-> [AppStore] : 3. dispatch(saveForecastAction)
+[AppStore] -> [SaveForecastEffect] : 4. pipe(saveForecastAction)
+[SaveForecastEffect] -down-> [ForecastService] : 5. saveForecast(Forecast)
+[ForecastService] -> [ForecastController] : 6. POST /forecast
+[ForecastController] -> [ForecastRepo] : 7. saveForecast(Forecast)
+[ForecastRepo] -up-> DB : 8. INSERT INTO forecast
+[ForecastRepo] -down-> [ForecastController] : 9. return forecast
+[ForecastController] --> [ForecastService] : 10. http response
+[ForecastService] --> [SaveForecastEffect] : 11. return forecast
+[SaveForecastEffect] --> [AppStore] : 12. dispatch(saveForecastSuccessAction)
+[AppStore] --> [PopUpEffect] : 13. pipe(saveForecastSuccessAction)
+[PopUpEffect] -down-> [popUpPresComponent] : 14. showPopUp()
+[popUpPresComponent] --> User : 15. Forecast has been saved
+@enduml

@@ -1,0 +1,44 @@
+@startuml
+left to right direction
+actor User
+
+rectangle "SPA" {
+    rectangle "UI Components" {
+        [CityPresentationComponent]
+        [CityContainerComponent]
+        [SuccessMessagePresentationComponent]
+    }
+
+    rectangle "Redux Store" {
+        [AppStore]
+        [AddCityToFavEffect]
+        [PopUpEffect]
+    }
+
+    [CityService]
+}
+
+rectangle "Server" {
+    [CityController]
+    [CityRepository]
+}
+
+database DB
+
+User -down-> CityPresentationComponent : 1. Натискає "Додати до улюблених"
+CityPresentationComponent -> CityContainerComponent : 2. Подія для додавання міста до улюблених
+CityContainerComponent -down-> AppStore : 3. Відправляє дію AddCityToFavAction
+AppStore -> AddCityToFavEffect : 4. Тригер
+AddCityToFavEffect -up-> CityService : 5. POST деталі міста
+CityService -down-> CityController : 6. /city/add
+CityController -> CityRepository: 7. Зберігає місто через репозиторій
+CityRepository -down-> DB: 8. INSERT INTO city
+DB -up-> CityRepository : 9. Успішно збережено
+CityRepository -up-> CityController : 10. Повертає результат
+CityController -up-> CityService : 11. Відповідь
+CityService -> AddCityToFavEffect : 12. Відповідь
+AddCityToFavEffect -up-> AppStore : 13. Відправляє дію AddCityToFavSuccessAction
+AppStore -down-> PopUpEffect : 14. Відправляє дію AddToFavSuccessAction
+PopUpEffect -> [SuccessMessagePresentationComponent] : 15. Показує повідомлення про успішне додавання
+SuccessMessagePresentationComponent -> User : 16. Показує "Місто додано до улюблених"
+@enduml
