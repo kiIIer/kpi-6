@@ -1,0 +1,210 @@
+@startuml spa
+left to right direction
+
+rectangle Redux {
+    class AppStore {
+        -state: AppState
+        -reducers: List<Reducer>
+        -effects: List<Effect>
+        +dispatch(action: Action): void
+        +select(selector: Selector): any
+    }
+
+    class CitiesEffects {
+        -citiesService: CitiesService
+        -store: AppStore
+    }
+
+    class ForecastEffects {
+        -forecastService: ForecastService
+        -store: AppStore
+    }
+
+    class NotificationsEffects {
+        -notificationsService: NotificationsService
+        -store: AppStore
+    }
+
+    class AuthenticationEffect {
+        -authService: AuthenticationService
+        -store: AppStore
+    }
+
+    class AppState {
+        +cityState: CityState
+        +forecastState: ForecastState
+        +notificationState: NotificationState
+        +authState: AuthState
+        +routerState: RouterState
+    }
+
+    class RouterEffects {
+        -router: Router
+        -store: AppStore
+    }
+
+    class CityState {
+        +currentCity: City
+        +cities: List<City>
+    }
+
+    class ForecastState {
+        +currentForecast: Forecast
+        +forecasts: List<Forecast>
+    }
+
+    class NotificationState {
+        +notifications: List<Notification>
+    }
+    class AuthState {
+        +token: string
+        +user: User
+        +isAuthenticated: boolean
+    }
+    class PopUpEffects {
+        +store: AppStore
+    }
+}
+
+class PopUpPresComponent {
+    +title: String
+    +content: String
+}
+
+class CitiesPresComponent {
+    +cities: List<City>
+    +addToFavEventEmmiter: EventEmitter<City>
+    +navigationEventEmmiter: EventEmitter<string>
+}
+
+class CitiesContComponent {
+    -store: AppStore
+}
+
+class ForecastPresComponent {
+    +city: City
+    +forecast: List<Forecast>
+    +navigationEventEmmiter: EventEmitter<string>
+}
+
+class ForecastContComponent {
+    -store: AppStore
+}
+
+class ToolbarPresComponent {
+    +activeTab: string
+    +navigationEventEmmiter: EventEmitter<string>
+}
+
+class ToolbarContComponent {
+    -store: AppStore
+}
+
+class NotificationsPresComponent {
+    +notifications: List<Notification>
+    +navigationEventEmmiter: EventEmitter<string>
+}
+
+class NotificationsContComponent {
+    -store: AppStore
+}
+
+class NavContComponent {
+}
+
+
+CitiesPresComponent <-- CitiesContComponent
+ForecastPresComponent <-- ForecastContComponent
+NotificationsPresComponent <-- NotificationsContComponent
+ToolbarPresComponent <-- ToolbarContComponent
+
+CitiesContComponent <-- NavContComponent
+ForecastContComponent <-- NavContComponent
+NotificationsContComponent <-- NavContComponent
+ToolbarContComponent <-- NavContComponent
+
+
+AppStore --o CitiesContComponent
+AppStore --o ForecastContComponent
+AppStore --o NotificationsContComponent
+AppStore --o ToolbarContComponent
+
+class CitiesService {
+    +getCities(): List<City>
+    +addToFav(city: City): result
+}
+
+class AuthenticationService {
+    +getToken(): string
+    +isAuthenticated(): boolean
+    +login(): void
+    +logout(): void
+}
+
+class ForecastService {
+    +getForecast(city: City): List<Forecast>
+    +createForecast(forecast: Forecast): result
+    +editForecast(forecast: Forecast): result
+    +deleteForecast(forecast: Forecast): result
+}
+
+class NotificationsService {
+    +getNotifications(): List<Notification>
+}
+
+
+CitiesEffects --* AppStore
+ForecastEffects --* AppStore
+NotificationsEffects --* AppStore
+AuthenticationEffect --* AppStore
+
+
+CitiesService -left-o CitiesEffects
+ForecastService -left-o ForecastEffects
+NotificationsService -down-o NotificationsEffects
+AuthenticationService -down-o AuthenticationEffect
+
+
+RouterEffects --* AppStore
+
+
+PopUpEffects --* AppStore
+PopUpEffects --> PopUpPresComponent
+
+class NotificationsGuard {
+    -store: AppStore
+}
+
+AppStore --o NotificationsGuard
+NotificationsGuard -- NotificationsContComponent
+
+class CitiesGuard {
+    -store: AppStore
+}
+
+AppStore --o CitiesGuard
+CitiesGuard -- CitiesContComponent
+
+class ForecastGuard {
+    -store: AppStore
+}
+
+AppStore --o ForecastGuard
+ForecastGuard -- ForecastContComponent
+
+CityState --* AppState
+ForecastState --* AppState
+NotificationState --* AppState
+AuthState --* AppState
+
+AppState --* AppStore
+
+class AuthenticationGuard {
+    -store: AppStore
+}
+
+AppStore --o AuthenticationGuard
+AuthenticationService --o AuthenticationGuard
+
+AuthenticationGuard -- NotificationsContComponent
+@enduml

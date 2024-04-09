@@ -1,7 +1,8 @@
-@startuml
+@startuml server
 
 struct ForecastController {
     -repo: Repository<WeatherForecast>
+    +GetWeatherForecast(w: ResponseWriter, r: Request)
     +AddWeatherForecast(w: ResponseWriter, r: Request)
     +EditWeatherForecast(w: ResponseWriter, r: Request)
     +DeleteWeatherForecast(w: ResponseWriter, r: Request)
