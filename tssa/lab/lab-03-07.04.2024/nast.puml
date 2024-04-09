@@ -1,0 +1,47 @@
+@startuml create-forecast
+left to right direction
+actor User
+rectangle SPA {
+    [CitiesPresComponent]
+    [CityContComponent]
+    [ForecastContComponent]
+    [ForecastPresComponent]
+    rectangle Redux{
+        [AppStore]
+        [NavigationEffect]
+        [LoadForecastEffect]
+        [LoadForecastReducer]
+    }
+    [ForecastService]
+    [Router]
+}
+
+rectangle Server {
+    [ForecastController]
+    [ForecastRepo]
+}
+
+database DB
+
+User -down-> [CitiesPresComponent] : 1. View Forecast Button
+[CitiesPresComponent] -> [CityContComponent] : 2. emit(ViewForecastEvent)
+[CityContComponent] -down-> [AppStore] : 3. dispatch(navigationAction)
+[AppStore] -> [NavigationEffect] : 4. pipe(navigationAction)
+[NavigationEffect] -> [Router] : 5. navigate(url)
+[Router] -> [AppStore] : 6. redirect
+[AppStore] -> [LoadForecastEffect] : 7. pipe(loadForecastAction)
+[LoadForecastEffect] -down-> [ForecastService] : 8. getForecast(ForecastId)
+[ForecastService] -> [ForecastController] : 9. GET /forecast
+[ForecastController] -> [ForecastRepo] : 10. getForecast(ForecastId)
+[ForecastRepo] -up-> DB : 11. SELECT FROM forecast
+[ForecastRepo] -down-> [ForecastController] : 12. return forecast
+[ForecastController] --> [ForecastService] : 13. http response
+[ForecastService] --> [LoadForecastEffect] : 14. return forecast
+[LoadForecastEffect] --> [AppStore] : 15. dispatch(loadForecastSuccessesAction)
+[AppStore] --> [LoadForecastReducer] : 16. pipe(loadForecastSuccessesAction)
+[LoadForecastReducer] --> [AppStore] : 17. return new state
+[AppStore] --> [ForecastContComponent] : 18. return new state
+[ForecastContComponent] --> [ForecastPresComponent] : 19. Attribute set
+[ForecastPresComponent] --> User : 20. Changes displayed
+
+@enduml
