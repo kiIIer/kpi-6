@@ -1,0 +1,65 @@
+@startuml server
+
+struct ForecastController {
+    -repo: Repository<WeatherForecast>
+    +GetWeatherForecast(w: ResponseWriter, r: Request)
+    +AddWeatherForecast(w: ResponseWriter, r: Request)
+    +EditWeatherForecast(w: ResponseWriter, r: Request)
+    +DeleteWeatherForecast(w: ResponseWriter, r: Request)
+}
+
+struct CitiesController {
+    -repo: Repository<City>
+    +AddCityToFavorites(w: ResponseWriter, r: Request)
+    +RemoveCityFromFavorites(w: ResponseWriter, r: Request)
+    +GetUserCities(w: ResponseWriter, r: Request)
+}
+
+struct NotificationsController {
+    -repo: Repository<Notification>
+    +AddCityNotification(w: ResponseWriter, r: Request)
+    +RemoveCityNotification(w: ResponseWriter, r: Request)
+}
+
+interface Repository {
+    +Create(entity: any)
+    +Read(id: string)
+    +Update(entity: any)
+    +Delete(id: string)
+}
+
+struct ForecastRepo {
+}
+
+struct CitiesRepo {
+}
+
+struct NotificationsRepo {
+}
+
+struct AuthInterceptor {
+    +intercept(next: Handler)
+}
+
+struct Program {
+    -notificationsController: NotificationsController
+    -citiesController: CitiesController
+    -forecastController: ForecastController
+    -authInterceptor: AuthInterceptor
+    +run()
+}
+
+ForecastRepo -up-|> Repository
+CitiesRepo -up-|> Repository
+NotificationsRepo -up-|> Repository
+
+ForecastRepo -up-o ForecastController
+CitiesRepo -up-o CitiesController
+NotificationsRepo -up-o NotificationsController
+
+ForecastController -up-o Program
+CitiesController -up-o Program
+NotificationsController -up-o Program
+AuthInterceptor -up-o Program
+
+@enduml
