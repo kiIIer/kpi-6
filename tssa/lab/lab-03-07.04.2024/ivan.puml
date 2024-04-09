@@ -1,0 +1,40 @@
+@startuml
+skinparam defaultFontName Arial
+skinparam titleFontSize 18
+
+actor User
+
+rectangle "SPA" {
+    [EditForecastPresComponent]
+    [EditForecastContComponent]
+    [popUpPresComponent]
+    rectangle Redux {
+        [AppStore]
+        [DeleteForecastEffect]
+        [PopUpEffect]
+    }
+    [ForecastService]
+}
+
+rectangle "Server" {
+    [ForecastController]
+    [ForecastRepo]
+    database DB
+}
+
+User -down-> [EditForecastPresComponent] : 1. Delete Forecast Button
+[EditForecastPresComponent] -> [EditForecastContComponent] : 2. emit(DeleteForecastEvent)
+[EditForecastContComponent] -down-> [AppStore] : 3. dispatch(deleteForecastAction)
+[AppStore] -> [DeleteForecastEffect] : 4. pipe(deleteForecastAction)
+[DeleteForecastEffect] -down-> [ForecastService] : 5. deleteForecast(ForecastId)
+[ForecastService] -down-> [ForecastController] : 6. DELETE /forecast/{id}
+[ForecastController] -> [ForecastRepo] : 7. deleteForecast(ForecastId)
+[ForecastRepo] -up-> DB : 8. DELETE FROM forecast WHERE id = ForecastId
+[ForecastRepo] -down-> [ForecastController] : 9. return success message
+[ForecastController] --> [ForecastService] : 10. http response
+[ForecastService] --> [DeleteForecastEffect] : 11. return success message
+[DeleteForecastEffect] --> [AppStore] : 12. dispatch(deleteForecastSuccessAction)
+[AppStore] --> [PopUpEffect] : 13. pipe(deleteForecastSuccessAction)
+[PopUpEffect] -down-> [popUpPresComponent] : 14. showPopUp()
+[popUpPresComponent] --> User : 15. Forecast has been deleted
+@enduml
