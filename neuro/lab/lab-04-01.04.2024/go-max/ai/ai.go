@@ -79,9 +79,9 @@ func Minimax(input MinimaxInput, tt *TranspositionTable) (float64, game.Move) {
 				} else {
 					input.Beta = math.Min(input.Beta, bestEval)
 				}
-				//if input.Beta <= input.Alpha {
-				//	break
-				//}
+				if input.Beta <= input.Alpha {
+					break
+				}
 			}
 		}
 	}
@@ -92,7 +92,7 @@ func Minimax(input MinimaxInput, tt *TranspositionTable) (float64, game.Move) {
 
 func Evaluate(g *game.Game) float64 {
 	blackTerritory, whiteTerritory := g.CalculateTerritories()
-	blackCaptures, whiteCaptures := 5*g.Captures[0], 5*g.Captures[1]
-	score := blackTerritory - whiteTerritory + blackCaptures - whiteCaptures
-	return float64(score)
+	blackCaptures, whiteCaptures := g.Captures[0], g.Captures[1]
+	score := blackTerritory - whiteTerritory + 5*float64(blackCaptures-whiteCaptures)
+	return score
 }

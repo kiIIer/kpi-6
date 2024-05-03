@@ -9,7 +9,6 @@ import (
 	"os/exec"
 	"runtime"
 	"strings"
-	"time"
 )
 
 func clearConsole() {
@@ -66,29 +65,29 @@ func makeAIMove(g *game.Game, tt *ai.TranspositionTable) {
 	}
 }
 
-//func main() {
-//	g := game.NewGame()
-//	tt := ai.NewTranspositionTable()
-//
-//	for {
-//		clearConsole()
-//		g.PrintBoard()
-//		printPossibleMoves(g)
-//		promptForMove(g, tt)
-//	}
-//}
-
 func main() {
 	g := game.NewGame()
 	tt := ai.NewTranspositionTable()
-	start := time.Now()
 
-	bestMove := ai.MinimaxDecision(g, tt)
-
-	duration := time.Since(start)
-	fmt.Printf("Best Move: %v\n", bestMove)
-	fmt.Printf("Time taken: %v\n", duration)
+	for {
+		clearConsole()
+		g.PrintBoard()
+		printPossibleMoves(g)
+		promptForMove(g, tt)
+	}
 }
+
+//func main() {
+//	g := game.NewGame()
+//	tt := ai.NewTranspositionTable()
+//	start := time.Now()
+//
+//	bestMove := ai.MinimaxDecision(g, tt)
+//
+//	duration := time.Since(start)
+//	fmt.Printf("Best Move: %v\n", bestMove)
+//	fmt.Printf("Time taken: %v\n", duration)
+//}
 
 func printPossibleMoves(g *game.Game) {
 	moves := g.GenerateMoves()
