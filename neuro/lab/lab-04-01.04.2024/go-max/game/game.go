@@ -246,7 +246,6 @@ func (g *Game) CalculateTerritories() (float64, float64) {
 		influence[i] = make([]float64, BoardSize)
 	}
 
-	// Spread influence from each stone
 	for i := 0; i < BoardSize; i++ {
 		for j := 0; j < BoardSize; j++ {
 			if g.Board[i][j] != 0 {
@@ -255,14 +254,13 @@ func (g *Game) CalculateTerritories() (float64, float64) {
 		}
 	}
 
-	// Summarize the influence for black and white territories
 	blackTerritory, whiteTerritory := 0.0, 0.0
 	for i := 0; i < BoardSize; i++ {
 		for j := 0; j < BoardSize; j++ {
 			if influence[i][j] > 0 {
 				blackTerritory += influence[i][j]
 			} else if influence[i][j] < 0 {
-				whiteTerritory -= influence[i][j] // Negative influence is for white, sum positively
+				whiteTerritory -= influence[i][j]
 			}
 		}
 	}
@@ -270,17 +268,14 @@ func (g *Game) CalculateTerritories() (float64, float64) {
 	return blackTerritory, whiteTerritory
 }
 
-// spreadInfluence propagates influence from a stone to its neighboring points.
 func (g *Game) spreadInfluence(x, y int, influence [][]float64) {
 	stone := g.Board[x][y]
 
-	// Temporary map to calculate the number of stones near each point
 	nearbyStones := make([][]int, BoardSize)
 	for i := range nearbyStones {
 		nearbyStones[i] = make([]int, BoardSize)
 	}
 
-	// First, calculate the density of stones around each point
 	for dx := -influenceRange; dx <= influenceRange; dx++ {
 		for dy := -influenceRange; dy <= influenceRange; dy++ {
 			nx, ny := x+dx, y+dy
@@ -290,14 +285,12 @@ func (g *Game) spreadInfluence(x, y int, influence [][]float64) {
 		}
 	}
 
-	// Then, spread the influence considering the density of nearby stones
 	for dx := -influenceRange; dx <= influenceRange; dx++ {
 		for dy := -influenceRange; dy <= influenceRange; dy++ {
 			nx, ny := x+dx, y+dy
 			if nx >= 0 && ny >= 0 && nx < BoardSize && ny < BoardSize {
 				distance := math.Sqrt(float64(dx*dx + dy*dy))
 				if distance <= float64(influenceRange) {
-					// Apply decay and discount based on nearby stone density
 					decayedInfluence := (1.0 - decayFactor*distance) * float64(stone)
 					clumpingDiscount := 1.0 - clumpingFactor*float64(nearbyStones[nx][ny])
 					influence[nx][ny] += decayedInfluence * clumpingDiscount
@@ -307,7 +300,6 @@ func (g *Game) spreadInfluence(x, y int, influence [][]float64) {
 	}
 }
 
-// updateDensity increments the density count for stones within a specified range
 func updateDensity(nearbyStones [][]int, x, y, size int) {
 	for dx := -1; dx <= 1; dx++ {
 		for dy := -1; dy <= 1; dy++ {
