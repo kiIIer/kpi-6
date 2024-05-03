@@ -14,9 +14,9 @@ func NewTranspositionTable() *TranspositionTable {
 }
 
 func (tt *TranspositionTable) Store(hash uint64, result MinimaxResult) {
-	//tt.mutex.Lock()
-	//defer tt.mutex.Unlock()
-	//tt.store[hash] = result
+	tt.mutex.Lock()
+	defer tt.mutex.Unlock()
+	tt.store[hash] = result
 }
 
 func (tt *TranspositionTable) Load(hash uint64) (MinimaxResult, bool) {

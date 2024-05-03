@@ -90,13 +90,6 @@ func Minimax(input MinimaxInput, tt *TranspositionTable) (float64, game.Move) {
 	return bestEval, bestMove
 }
 
-func noMoveEval(maxPlayer bool) float64 {
-	if maxPlayer {
-		return -math.Inf(1)
-	}
-	return math.Inf(1)
-}
-
 func Evaluate(g *game.Game) float64 {
 	blackTerritory, whiteTerritory := g.CalculateTerritories()
 	blackCaptures, whiteCaptures := 5*g.Captures[0], 5*g.Captures[1]

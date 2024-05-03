@@ -5,7 +5,7 @@ import (
 	"hash/fnv"
 )
 
-const BoardSize = 5
+const BoardSize = 7
 
 type Game struct {
 	Board            [BoardSize][BoardSize]int
