@@ -1,0 +1,24 @@
+@startuml
+title User Authentication and Notification Retrieval Flow
+
+[*] --> NotAuthenticated
+NotAuthenticated --> Authenticating : Attempt to Authenticate/Login
+Authenticating --> Authenticated : Authentication Successful
+Authenticating --> NotAuthenticated : Authentication Failed
+Authenticated --> FetchingNotifications : Fetch Notifications
+FetchingNotifications --> NotificationsLoaded : Notifications Success
+FetchingNotifications --> FetchFailed : Fetch Error
+FetchFailed --> RetryFetching : Retry Notifications
+RetryFetching --> FetchingNotifications : Retry Success
+NotificationsLoaded --> UserLoggedOut : User Logout
+Authenticated --> UserLoggedOut : User Logout
+NotAuthenticated --> UserLoggedOut : User Logout
+FetchFailed --> UserLoggedOut : User Logout
+UserLoggedOut --> [*]
+
+note right of Authenticating : AuthService checks login status
+note right of FetchingNotifications : Request to server for notifications
+note right of RetryFetching : Attempting to fetch again after failure
+note left of NotificationsLoaded : Notifications are available to the user
+note left of UserLoggedOut : User has successfully logged out
+@enduml

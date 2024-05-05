@@ -1,0 +1,19 @@
+@startuml redux-flow
+
+title Angular SPA with Redux and Effects Flow
+
+[*] --> InitialState
+InitialState --> ActionDispatched : User Interaction/API Response
+ActionDispatched --> EffectProcessing : Trigger Effect
+EffectProcessing --> ActionDispatched : Dispatch Resultant Action
+ActionDispatched --> ReducersProcessing : Dispatch Action
+ReducersProcessing --> StateUpdated : Execute Reducers
+StateUpdated --> ViewUpdated : Update State
+ViewUpdated --> ActionDispatched : User Interaction/API Response
+
+note right of ActionDispatched : Actions describe what happened
+note right of EffectProcessing : Effects handle side effects
+note right of ReducersProcessing : Reducers calculate new state
+note left of StateUpdated : Store is updated
+note left of ViewUpdated : UI components re-render
+@enduml

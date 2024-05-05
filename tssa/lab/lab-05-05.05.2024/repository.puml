@@ -1,0 +1,19 @@
+@startuml repositoyr_connection_state_diagram
+title Repository Connection State Diagram
+
+[*] --> Disconnected
+
+Disconnected --> Connecting : Connect()
+Connecting --> Connected : Connection Successful
+Connecting --> ConnectionFailed : Connection Failed
+ConnectionFailed --> Reconnecting : Retry Connection
+Reconnecting --> Connected : Reconnection Successful
+Reconnecting --> ConnectionFailed : Reconnection Failed
+Connected --> Disconnected : Disconnect()
+Connected --> Disconnected : Error Detected
+
+note right of Connecting : Attempting to establish connection
+note right of Reconnecting : Attempting to re-establish connection
+note left of Connected : Database operations are enabled
+note left of ConnectionFailed : Retry logic engaged
+@enduml

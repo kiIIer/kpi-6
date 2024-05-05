@@ -1,0 +1,19 @@
+@startuml request_processing_state_diagram
+title HTTP Request Processing State Diagram
+
+[*] --> RequestReceived : Receive Request
+RequestReceived --> Authenticating : Begin Authentication
+Authenticating --> Authenticated : Authentication Successful
+Authenticating --> AuthenticationFailed : Authentication Unsuccessful
+Authenticated --> AccessingDatabase : Database Access
+AccessingDatabase --> RequestFulfilled : Database Success
+AccessingDatabase --> RequestFailed : Database Error
+RequestFulfilled --> [*] : Send Response
+AuthenticationFailed --> [*] : Error Handling
+RequestFailed --> [*] : Error Handling
+
+note right of Authenticating : Checking user credentials
+note right of AccessingDatabase : Fetching/Updating data in DB
+note left of RequestFulfilled : Data processed successfully
+note left of RequestFailed : Error in request processing
+@enduml
