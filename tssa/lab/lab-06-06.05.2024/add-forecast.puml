@@ -1,0 +1,40 @@
+@startuml
+start
+
+:Login as Administrator;
+:Search for City;
+
+while (City not found?) is (no)
+    :Enter Different City Name;
+    :Search for City;
+endwhile
+
+:Select City from Results;
+
+:Enter Forecast Details;
+while (Add Another Forecast?) is (yes)
+    :Enter Forecast Details;
+    while (Forecast Details Correct?) is (no)
+        :Correct Forecast Details;
+        :Re-enter Forecast Details;
+    endwhile
+
+    :Press 'Add';
+endwhile
+
+
+:Press 'Save' to Submit All Forecasts;
+:Send REST Request to Server;
+note right: REST API Call with Forecast Details
+
+if (Server Saves Successfully?) then (yes)
+    :Receive Success Response;
+    note right: All Forecasts Added Successfully
+else (no)
+    :Receive Failure Response;
+    note right: Handle Failure, Log Error
+endif
+
+
+stop
+@enduml
