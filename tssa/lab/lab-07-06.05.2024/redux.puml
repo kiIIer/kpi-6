@@ -1,0 +1,55 @@
+@startuml redux_component
+
+left to right direction
+
+() AppStore
+
+component ReduxComponent {
+    interface Reduce
+    component ReducerComponent
+
+    interface Pipe
+    component EffectComponent
+
+    interface Select
+    component SelectorComponent
+
+    interface Actions
+    component ActionsComponent
+
+    component AppStoreComponent
+}
+
+component AuthenticationComponent
+() AuthenticationService
+component NotificationsComponent
+() NotificationsService
+component ForecastComponent
+() ForecastService
+component CitiesComponent
+() CitiesService
+
+ReducerComponent - Reduce
+EffectComponent - Pipe
+SelectorComponent - Select
+ActionsComponent - Actions
+
+AppStoreComponent --( Reduce
+AppStoreComponent --( Pipe
+AppStoreComponent --( Select
+AppStoreComponent --( Actions
+
+AppStoreComponent -- AppStore
+
+AuthenticationComponent - AuthenticationService
+NotificationsComponent - NotificationsService
+ForecastComponent - ForecastService
+CitiesComponent - CitiesService
+
+EffectComponent -up( AuthenticationService
+EffectComponent -up( NotificationsService
+EffectComponent -up( ForecastService
+EffectComponent -up( CitiesService
+
+
+@enduml
