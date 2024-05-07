@@ -1,0 +1,59 @@
+@startuml
+skinparam rectangle {
+    BackgroundColor Snow
+    BorderColor Black
+    Shadowing false
+}
+
+node "Cloud Environment" {
+    package "Kubernetes Cluster" {
+        component "Load Balancer" as LB
+
+        node "Pod 1" {
+            component "REST Service" as REST1
+            component "SPA" as SPA1
+            database "Database" as DB1
+        }
+        node "Pod 2 (Replica)" {
+            component "REST Service" as REST2
+            component "SPA" as SPA2
+            database "Database" as DB2
+        }
+        node "Pod 3 (Replica)" {
+            component "REST Service" as REST3
+            component "SPA" as SPA3
+            database "Database" as DB3
+        }
+
+        LB -down-> SPA1 : "Routes to"
+        LB -down-> SPA2 : "Routes to"
+        LB -down-> SPA3 : "Routes to"
+    }
+
+    database "Persistent Volume [Database Storage]" as PV {
+        folder "Data Files" as DataFiles
+    }
+
+    REST1 ..> SPA1 : "API Calls"
+    SPA1 ..> REST1 : "Requests"
+    REST1 ..> DB1 : "Queries"
+    DB1 ..> REST1 : "Data Response"
+    
+    REST2 ..> SPA2 : "API Calls"
+    SPA2 ..> REST2 : "Requests"
+    REST2 ..> DB2 : "Queries"
+    DB2 ..> REST2 : "Data Response"
+    
+    REST3 ..> SPA3 : "API Calls"
+    SPA3 ..> REST3 : "Requests"
+    REST3 ..> DB3 : "Queries"
+    DB3 ..> REST3 : "Data Response"
+    
+    DB1 ..> PV : "Stores Data in"
+    DB2 ..> PV : "Stores Data in"
+    DB3 ..> PV : "Stores Data in"
+
+    agent "User's Device [Web Browser]" as UserDevice
+    UserDevice --> LB : "Connects to"
+}
+@enduml
