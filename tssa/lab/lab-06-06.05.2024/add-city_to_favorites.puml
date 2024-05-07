@@ -1,0 +1,31 @@
+@startuml add-city_to_favorites
+start
+
+:Login as User;
+:Enter City Name;
+
+while (City not found?) is (no)
+:Enter Different City Name;
+:Search for City;
+endwhile
+
+:Select City from Search Results;
+:User selects "Add to Favorites";
+:Confirm Selection;
+if (Selection is confirmed?) then (yes)
+:Send Request to Server;
+note right: REST API Call with City Details
+if (Server Response is Success?) then (yes)
+:Receive Success Response;
+note right: City Added to Favorites
+else (no)
+:Receive Failure Response;
+note right: Handle Failure, Display Error Message
+endif
+else (no)
+:Cancel Operation;
+note right: Return to Previous Screen
+endif
+
+stop
+@enduml

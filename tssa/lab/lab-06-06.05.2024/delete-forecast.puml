@@ -1,0 +1,35 @@
+@startuml delete-forecast
+start
+
+:Login as Administrator;
+:Search for City;
+
+while (City not found?) is (no)
+    :Enter Different City Name;
+    :Search for City;
+endwhile
+
+:Select City from Results;
+
+if (Forecast Exists for City?) then (yes)
+    :Confirm Forecast Deletion;
+    if (Deletion Confirmed?) then (yes)
+        :Delete Forecast;
+        :Send REST Request to Server;
+        note right: REST API Call with City Details
+        if (Server Deletes Successfully?) then (yes)
+            :Receive Success Response;
+            note right: Forecast Deleted Successfully
+        else (no)
+            :Receive Failure Response;
+            note right: Handle Failure, Log Error
+        endif
+    else (no)
+        :Cancel Deletion;
+    endif
+else (no)
+    :No Forecast to Delete;
+endif
+
+stop
+@enduml
