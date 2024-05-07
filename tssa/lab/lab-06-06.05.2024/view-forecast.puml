@@ -1,0 +1,30 @@
+@startuml view-forecast
+start
+:Login as User;
+if (Logged in successfully?) then (yes)
+    :Search for Forecast;
+    if (Forecast found?) then (yes)
+        :View Forecast;
+        while (Viewed Forecast?) is (yes)
+            :Select Option;
+            if (Option is "View More Forecasts") then (yes)
+                :View More Forecasts;
+            elseif (Option is "Exit") then (yes)
+                :Exit;
+            endif
+        endwhile
+        :Exit;
+    elseif (Forecast found?) then (no)
+        :Display Message "Forecast not found. Do you want to search for another forecast?";
+        :Ask User "Search for Another Forecast?";
+        if (User responds "Yes") then (yes)
+            :Return to Search for Forecast;
+        elseif (User responds "No") then (yes)
+            :Exit;
+        endif
+    endif
+elseif (Logged in successfully?) then (no)
+    :Display Error Message;
+    stop
+endif
+@enduml

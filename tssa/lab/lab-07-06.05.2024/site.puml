@@ -1,0 +1,31 @@
+@startuml site
+
+component Redux
+interface AppStore
+
+component GuardComponent
+interface Guard
+
+Redux -- AppStore
+GuardComponent -( AppStore
+GuardComponent -- Guard
+
+component ServiceComponent
+interface Service
+
+ServiceComponent -- Service
+GuardComponent -( Service
+
+component ContainerComponentsComponent
+
+ContainerComponentsComponent -( Guard
+
+ContainerComponentsComponent -( AppStore
+
+component PresentationComponentsComponent
+interface PresenationComponents
+
+PresentationComponentsComponent -- PresenationComponents
+ContainerComponentsComponent --( PresenationComponents
+
+@enduml

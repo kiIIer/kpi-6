@@ -1,0 +1,33 @@
+@startuml server
+left to right direction
+
+
+component ServerComponent {
+
+    component ControllerComponent
+
+    interface Service
+    component ServiceComponent
+
+    interface Repository
+    component RepositoryComponent
+
+    interface Interceptor
+    component InterceptorComponent
+}
+
+
+ControllerComponent--( Service
+
+
+ServiceComponent - Service
+
+
+ServiceComponent --( Repository
+
+
+RepositoryComponent- Repository
+
+InterceptorComponent -- Interceptor
+ControllerComponent -( Interceptor
+@enduml
